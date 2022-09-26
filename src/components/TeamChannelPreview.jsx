@@ -38,7 +38,7 @@ const TeamChannelPreview = ({ channel, type }) => {
                 console.log(channel)
             }}
         >
-
+            {type === 'team' ? <ChannelPreview /> : <DirectPreview />}
         </div>
     )
 }

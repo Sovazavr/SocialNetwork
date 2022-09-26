@@ -4,25 +4,47 @@ import axios from 'axios'
 
 import signinImage from '../assets/signup.jpg'
 
-const initialState={
+const cookies = new Cookies()
+
+const initialState = {
     fullName: '',
     username: '',
     password: '',
     confirmPassword: '',
-    phoneNumber: '', 
+    phoneNumber: '',
     avatarURL: '',
 }
 
 const Auth = () => {
     const [isSignup, setIsSignup] = useState(true)
-    const [form, setForm]=useState(initialState)
+    const [form, setForm] = useState(initialState)
 
     const handleChange = (e) => {
-        setForm({...form, [e.target.name]: e.target.value})
+        setForm({ ...form, [e.target.name]: e.target.value })
     }
 
-    const handleSubmit=(e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault()
+
+        const { fullName, username, password, phoneNumber, avatarURL } = form
+
+        const URL = "http://localhost:5000/auth"
+        const { data: { token, userId, hashedPassword } } = await axios.post(`${URL}/${isSignup ? 'signup' : 'login'}`, {
+            username, password, fullName, phoneNumber, avatarURL
+        })
+
+        cookies.set('token', token)
+        cookies.set('username', username)
+        cookies.set('fullName', fullName)
+        cookies.set('userId', userId)
+
+        if (isSignup) {
+            cookies.set('phoneNumber', avatarURL)
+            cookies.set('avatarURL', fullName)
+            cookies.set('hashedPassword', hashedPassword)
+        }
+
+        window.location.reload()
     }
 
     const switchMode = () => {
@@ -126,7 +148,7 @@ const Auth = () => {
                 </div>
             </div>
             <div className='auth__form-container_image'>
-                <img src={signinImage} alt="sign in"/>
+                <img src={signinImage} alt="sign in" />
             </div>
         </div>
     )
